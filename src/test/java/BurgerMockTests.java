@@ -1,3 +1,4 @@
+import org.assertj.core.api.SoftAssertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,7 +11,6 @@ import praktikum.Ingredient;
 import praktikum.IngredientType;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BurgerMockTests {
@@ -18,16 +18,16 @@ public class BurgerMockTests {
     @Mock
     private Bun mockBun;
     @Mock
-    private Ingredient mockIngredient1;
+    private Ingredient mockIngredientOne;
     @Mock
-    private Ingredient mockIngredient2;
+    private Ingredient mockIngredientTwo;
     @Before
     public void setUp(){
         MockitoAnnotations.initMocks(this);
         burger = new Burger();
         mockBun = new Bun("Булка", 10f);
-        mockIngredient1 = new Ingredient(IngredientType.FILLING, "Котлета", 5.0f);
-        mockIngredient2 = new Ingredient(IngredientType.SAUCE, "Начинка", 75f);
+        mockIngredientOne = new Ingredient(IngredientType.FILLING, "Котлета", 5.0f);
+        mockIngredientTwo = new Ingredient(IngredientType.SAUCE, "Начинка", 75f);
     }
     @Test
     public void setBunsTest(){
@@ -38,48 +38,51 @@ public class BurgerMockTests {
     }
     @Test
     public void addIngredientTest(){
+        SoftAssertions softly = new SoftAssertions();
 
-        burger.addIngredient(mockIngredient1);
-
-        assertEquals(1,burger.ingredients.size());
-        assertEquals(mockIngredient1,burger.ingredients.get(0));
-        assertEquals("Котлета", burger.ingredients.get(0).getName());
-        assertEquals(5.0f, burger.ingredients.get(0).getPrice(), 0.01f);
+        burger.addIngredient(mockIngredientOne);
+        softly.assertThat(1).isEqualTo(burger.ingredients.size());
+        softly.assertThat(mockIngredientOne).isEqualTo(burger.ingredients.get(0));
+        softly.assertThat("Котлета").isEqualTo(burger.ingredients.get(0).getName());
+        softly.assertThat(5.0f).isEqualTo(burger.ingredients.get(0).getPrice());
+        softly.assertAll();
     }
     @Test
     public void removeIngredientTest(){
 
-        burger.addIngredient(mockIngredient1);
+        burger.addIngredient(mockIngredientOne);
         burger.removeIngredient(0);
 
         assertEquals(0,burger.ingredients.size());
     }
     @Test
     public void moveIngredientsTest(){
+        SoftAssertions softly = new SoftAssertions();
 
-        burger.addIngredient(mockIngredient1);
-        burger.addIngredient(mockIngredient2);
+        burger.addIngredient(mockIngredientOne);
+        burger.addIngredient(mockIngredientTwo);
 
         burger.moveIngredient(0,1);
 
-        assertEquals(2,burger.ingredients.size());
-        assertEquals(mockIngredient1,burger.ingredients.get(1));
-        assertEquals(mockIngredient2,burger.ingredients.get(0));
+        softly.assertThat(2).isEqualTo(burger.ingredients.size());
+        softly.assertThat(mockIngredientOne).isEqualTo(burger.ingredients.get(1));
+        softly.assertThat(mockIngredientTwo).isEqualTo(burger.ingredients.get(0));
+        softly.assertAll();
     }
     @Test
     public void testGetReceiptWithMultipleIngredients() {
 
         burger.setBuns(mockBun);
-        burger.addIngredient(mockIngredient1);
-        burger.addIngredient(mockIngredient2);
+        burger.addIngredient(mockIngredientOne);
+        burger.addIngredient(mockIngredientTwo);
 
         String receipt = burger.getReceipt();
 
         String expectedReceipt = String.format("(==== %s ====)%n", mockBun.getName()) +
-                String.format("= %s %s =%n", mockIngredient1.getType().toString().toLowerCase(),
-                        mockIngredient1.getName()) +
-                String.format("= %s %s =%n", mockIngredient2.getType().toString().toLowerCase(),
-                        mockIngredient2.getName()) +
+                String.format("= %s %s =%n", mockIngredientOne.getType().toString().toLowerCase(),
+                        mockIngredientOne.getName()) +
+                String.format("= %s %s =%n", mockIngredientTwo.getType().toString().toLowerCase(),
+                        mockIngredientTwo.getName()) +
                 String.format("(==== %s ====)%n", mockBun.getName()) +
                 String.format("%nPrice: %f%n", burger.getPrice());
 
